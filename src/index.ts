@@ -1,9 +1,12 @@
 import http from 'http'
 import express from 'express'
-
 import { sequelize } from './db'
 import ProgramRouter from './routes/programs'
 import ExerciseRouter from './routes/exercises'
+import dotenv from 'dotenv';
+import { errorHandler } from './middleware/errorHandler'
+
+dotenv.config();
 
 const app = express()
 
@@ -11,7 +14,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use('/programs', ProgramRouter())
 app.use('/exercises', ExerciseRouter())
-
+app.use(errorHandler);
 const httpServer = http.createServer(app)
 
 try {
