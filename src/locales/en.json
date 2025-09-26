@@ -11,6 +11,10 @@
   "USER_DETAIL": "User detail",
   "USER_UPDATED": "User updated",
   "LIST_OF_USERS": "List of users",
+  "EXERCISE_TRACKED": "Exercise tracked",
+  "COMPLETED_EXERCISES_LIST": "List of completed exercises",
+  "TRACKED_ITEM_NOT_FOUND": "Tracked item not found",
+  "DELETED": "Deleted",
 
   "LIST_OF_EXERCISE": "List of exercises",
   "PROGRAM_NOT_FOUND": "Program not found",

@@ -8,10 +8,11 @@ import {
   idUserParamSchema,
   updateUserSchema,
 } from "../validation/schemas/userSchema";
+import { createCompletedExerciseSchema } from "../validation/schemas/completedExerciseSchema";
 
 const router = Router();
 
-const { User } = models;
+const { User, CompletedExercise, Exercise } = models;
 
 export default () => {
   router.get(
@@ -122,5 +123,100 @@ export default () => {
       }
     }
   );
+  //ROUTES FOR TRACKING EXERCISES
+    router.post(
+        "/me/completed-exercises",
+        [
+            authMiddleware,
+            roleMiddleware([USER_ROLE.USER]),
+            validate({
+                body: createCompletedExerciseSchema,
+            }),
+        ],
+        async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+            try {
+                const currentUser = req.user as UserModel;
+                const { exerciseId, duration, completedAt } = req.body;
+
+                const exercise = await Exercise.findByPk(exerciseId);
+                if (!exercise) {
+                    return res
+                        .status(404)
+                        .json({ data: {}, message: req.t("EXERCISE_NOT_FOUND") });
+                }
+
+                const completedExercise = await CompletedExercise.create({
+                    userID: currentUser.id,
+                    exerciseID: exerciseId,
+                    completedAt: completedAt ? new Date(completedAt) : new Date(),
+                    duration,
+                });
+
+                return res
+                    .status(201)
+                    .json({
+                        data: { id: completedExercise.id },
+                        message: req.t("EXERCISE_TRACKED"),
+                    });
+            } catch (err) {
+                err.contextMessage = "Error creating completed exercise";
+                next(err);
+            }
+        }
+    );
+
+router.get(
+    "/me/completed-exercises",
+    [authMiddleware, roleMiddleware([USER_ROLE.USER])],
+    async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+        try {
+            const currentUser = req.user as UserModel;
+
+            const completedExercises = await CompletedExercise.findAll({
+                where: { userID: currentUser.id },
+                attributes: ["id", "exerciseID", "duration", "completedAt"],
+                order: [["completedAt", "DESC"]],
+            });
+
+            return res.json({
+                data: completedExercises,
+                message: req.t("COMPLETED_EXERCISES_LIST"),
+            });
+        } catch (err) {
+            err.contextMessage = "Error fetching completed exercises";
+            next(err);
+        }
+    }
+);
+
+router.delete(
+    "/me/completed-exercises/:id",
+    [
+        authMiddleware,
+        roleMiddleware([USER_ROLE.USER]),
+        validate({ params: idUserParamSchema }),
+    ],
+    async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+        try {
+            const currentUser = req.user as UserModel;
+            const { id } = req.params;
+
+            const item = await CompletedExercise.findOne({
+                where: { id, userID: currentUser.id },
+            });
+            if (!item) {
+                return res
+                    .status(404)
+                    .json({ data: {}, message: req.t("TRACKED_ITEM_NOT_FOUND") });
+            }
+
+            await item.destroy();
+            return res.status(204).send();
+        } catch (err) {
+            err.contextMessage = "Error deleting tracked exercise";
+            next(err);
+        }
+    }
+);
   return router;
 };
