@@ -20,3 +20,10 @@ export const updateExerciseSchema = Joi.object({
   name: Joi.string().min(2).max(200).optional(),
   programID: Joi.number().integer().positive().optional(),
 }).min(1);
+
+export const exerciseQuerySchema = Joi.object({
+  page: Joi.number().integer().min(1).default(1),
+  limit: Joi.number().integer().min(1).max(100).default(10),
+  programID: Joi.number().integer().optional(),
+  search: Joi.string().max(100).optional(),
+});
