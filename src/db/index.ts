@@ -3,6 +3,7 @@ import { Sequelize } from "sequelize";
 import defineExercise from "./exercise";
 import defineProgram from "./program";
 import defineUser from "./user";
+import defineCompletedExercise from "./completedExercise";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -18,11 +19,13 @@ sequelize
 const Exercise = defineExercise(sequelize, "exercise");
 const Program = defineProgram(sequelize, "program");
 const User = defineUser(sequelize, "user");
+const CompletedExercise = defineCompletedExercise(sequelize, "completedExercise")
 
 const models = {
   Exercise,
   Program,
   User,
+  CompletedExercise
 };
 type Models = typeof models;
 

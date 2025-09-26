@@ -66,6 +66,10 @@ export default (sequelize: Sequelize, modelName: string) => {
       tableName: "users",
     }
   );
-
+  UserModelCtor.associate = (models: any) => {
+    UserModelCtor.hasMany(models.CompletedExercise, {
+      foreignKey: { name: "userID" },
+    });
+  };
   return UserModelCtor;
 };
