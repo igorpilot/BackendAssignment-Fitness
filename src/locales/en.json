@@ -6,6 +6,12 @@
   "UNAUTHORIZED": "Unauthorized",
   "FORBIDDEN": "Forbidden: insufficient role",
 
+  "USER_NOT_FOUND": "User not found",
+  "USERS_NOT_FOUND": "Users not found",
+  "USER_DETAIL": "User detail",
+  "USER_UPDATED": "User updated",
+  "LIST_OF_USERS": "List of users",
+
   "LIST_OF_EXERCISE": "List of exercises",
   "PROGRAM_NOT_FOUND": "Program not found",
   "EXERCISE CREATED": "Exercise created successfully",

@@ -6,6 +6,12 @@
   "UNAUTHORIZED": "Neautorizovaný prístup",
   "FORBIDDEN": "Zakázané: nedostatočné oprávnenie",
 
+  "USER_NOT_FOUND": "Používateľ nenájdený",
+  "USERS_NOT_FOUND": "Používatelia nenájdení",
+  "USER_DETAIL": "Detail používateľa",
+  "USER_UPDATED": "Používateľ aktualizovaný",
+  "LIST_OF_USERS": "Zoznam používateľov",
+
   "LIST_OF_EXERCISE": "Zoznam cvičení",
   "PROGRAM_NOT_FOUND": "Program sa nenašiel",
   "EXERCISE CREATED": "Cvičenie bolo úspešne vytvorené",
