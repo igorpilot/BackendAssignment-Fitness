@@ -7,12 +7,13 @@ import AuthRouter from './routes/auth'
 import dotenv from 'dotenv';
 import { errorHandler } from './middleware/errorHandler'
 import passport from './middleware/passport'
+import { initLocalization } from './utils/localization'
 
 
 dotenv.config();
 
 const app = express()
-
+app.use(initLocalization());
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use('/programs', ProgramRouter())

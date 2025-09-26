@@ -1,5 +1,4 @@
 import { Router, Request, Response, NextFunction } from "express";
-
 import { models } from "../db";
 import { authMiddleware, roleMiddleware } from "../middleware/auth";
 import { USER_ROLE } from "../utils/enums";
@@ -17,7 +16,7 @@ const { Exercise, Program } = models;
 export default () => {
   router.get(
     "/",
-    async (_req: Request, res: Response, next: NextFunction): Promise<any> => {
+    async (req: Request, res: Response, next: NextFunction): Promise<any> => {
       try {
         const exercises = await Exercise.findAll({
           include: [
@@ -29,7 +28,7 @@ export default () => {
 
         return res.json({
           data: exercises,
-          message: "List of exercises",
+          message: req.t("LIST_OF_EXERCISE"),
         });
       } catch (err) {
         err.contextMessage = "Error during fetching exercises";
@@ -51,10 +50,10 @@ export default () => {
         if (!program) {
           return res
             .status(404)
-            .json({ data: {}, message: "Program not found" });
+            .json({ data: {}, message: req.t("PROGRAM_NOT_FOUND") });
         }
         const exercise = await Exercise.create({ name, difficulty, programID });
-        res.json({ data: { id: exercise.id }, message: "Exercise created" });
+        res.json({ data: { id: exercise.id }, message: req.t("EXERCISE CREATED") });
       } catch (err) {
         err.contextMessage = "Error during admin create exercise";
         next(err);
@@ -77,7 +76,7 @@ export default () => {
         if (!exercise) {
           return res
             .status(404)
-            .json({ data: {}, message: "Exercise not found" });
+            .json({ data: {}, message: req.t("EXERCISE_NOT_FOUND") });
         }
         const ALLOWED_FIELDS = ["name", "difficulty", "programID"];
         Object.keys(req.body).forEach((field) => {
@@ -87,7 +86,7 @@ export default () => {
         });
 
         await exercise.save();
-        res.json({ data: { id: exercise.id }, message: "Exercise updated" });
+        res.json({ data: { id: exercise.id }, message: req.t("EXERCISE_UPDATED") });
       } catch (err) {
         err.contextMessage = "Error during admin change exercise";
         next(err);
@@ -110,10 +109,10 @@ export default () => {
         if (!exercise) {
           return res
             .status(404)
-            .json({ data: {}, message: "Exercise not found" });
+            .json({ data: {}, message: req.t("EXERCISE_NOT_FOUND") });
         }
         await Exercise.destroy({ where: { id } });
-        res.status(204).json({ data: {}, message: "Exercise deleted" });
+        res.status(204).json({ data: {}, message: req.t("EXERCISE_DELETED") });
       } catch (err) {
         err.contextMessage = "Error during admin delete exercise";
         next(err);

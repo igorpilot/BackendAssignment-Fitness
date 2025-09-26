@@ -15,13 +15,13 @@ export default () => {
   router.post(
     "/register",
     validate({ body: registerAuthSchema }),
-    async (req: Request, res: Response, _next: NextFunction): Promise<any> => {
+    async (req: Request, res: Response, next: NextFunction): Promise<any> => {
       const { name, surname, nickName, email, age, role, password } = req.body;
 
       try {
         const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
-          return res.status(409).json({ message: "Email already in use" });
+          return res.status(409).json({ message: req.t("EMAIL_ALREADY_IN_USE") });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = await User.create({
@@ -37,11 +37,11 @@ export default () => {
 
         res.json({
           data: { token, id: newUser.id },
-          message: "User successfully registered",
+          message: req.t("USER_REGISTERED"),
         });
       } catch (err: any) {
         err.contextMessage = "Error during user registration";
-        _next(err);
+        next(err);
       }
     }
   );
@@ -49,27 +49,27 @@ export default () => {
   router.post(
     "/login",
     validate({ body: loginAuthSchema }),
-    async (req: Request, res: Response, _next: NextFunction): Promise<any> => {
+    async (req: Request, res: Response, next: NextFunction): Promise<any> => {
       const { email, password } = req.body;
       try {
         const user = await User.findOne({ where: { email } });
         if (!user) {
-          return res.status(401).json({ message: "Invalid email or password" });
+          return res.status(401).json({ message: req.t("INVALID_CREDENTIALS") });
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-          return res.status(401).json({ message: "Invalid email or password" });
+          return res.status(401).json({ message: req.t("INVALID_CREDENTIALS") });
         }
         const token = signToken({ id: user.id });
 
         return res.json({
           data: { token, id: user.id },
-          message: "Login successful",
+          message: req.t("LOGIN_SUCCESS"),
         });
       } catch (err: any) {
         err.contextMessage = "Error during user login";
-        _next(err);
+        next(err);
       }
     }
   );

@@ -1,26 +1,25 @@
-import {
-	Router,
-	Request,
-	Response,
-	NextFunction
-} from 'express'
+import { Router, Request, Response, NextFunction } from "express";
+import { models } from "../db";
 
-import { models } from '../db'
+const router = Router();
 
-const router = Router()
-
-const {
-	Program
-} = models
+const { Program } = models;
 
 export default () => {
-	router.get('/', async (_req: Request, res: Response, _next: NextFunction): Promise<any> => {
-		const programs = await Program.findAll()
-		return res.json({
-			data: programs,
-			message: 'List of programs'
-		})
-	})
-
-	return router
-}
+  router.get(
+    "/",
+    async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+      try {
+        const programs = await Program.findAll();
+        return res.json({
+          data: programs,
+          message: req.t("LIST_OF_PROGRAMS"),
+        });
+      } catch (err: any) {
+        err.contextMessage = "Error fetching all programs";
+        next(err);
+      }
+    }
+  );
+  return router;
+};

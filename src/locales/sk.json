@@ -1,0 +1,17 @@
+{
+  "EMAIL_ALREADY_IN_USE": "Email je už používaný",
+  "USER_REGISTERED": "Používateľ bol úspešne zaregistrovaný",
+  "INVALID_CREDENTIALS": "Neplatný email alebo heslo",
+  "LOGIN_SUCCESS": "Prihlásenie bolo úspešné",
+  "UNAUTHORIZED": "Neautorizovaný prístup",
+  "FORBIDDEN": "Zakázané: nedostatočné oprávnenie",
+
+  "LIST_OF_EXERCISE": "Zoznam cvičení",
+  "PROGRAM_NOT_FOUND": "Program sa nenašiel",
+  "EXERCISE CREATED": "Cvičenie bolo úspešne vytvorené",
+  "EXERCISE_NOT_FOUND": "Cvičenie nebolo nájdené",
+  "EXERCISE_UPDATED": "Cvičenie bolo úspešne aktualizované",
+  "EXERCISE_DELETED": "Cvičenie bolo úspešne vymazané",
+
+  "LIST_OF_PROGRAMS": "Zoznam programov"
+}
