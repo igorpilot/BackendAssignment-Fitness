@@ -1,3 +1,62 @@
+# Fitness app – Implementation Summary
+- Implemented user authentication using JWT and Passport-based middleware for access control.
+- Created a User model with roles ADMIN and USER, along with middleware to enforce role-based access, and endpoints for registration and login.
+- ADMIN capabilities: manage exercises (create, update, delete), manage programs (add or remove exercises), and view or edit all users.
+- USER capabilities: view own profile and a list of users (id, nickName); created a CompletedExercise model to track completed exercises (with datetime and duration) and remove entries.
+- Added pagination, filtering, and full-text search functionality for the exercises list.
+- Implemented request validation via Joi for body, query, and params.
+- Implemented message localization (EN / SK) using i18n.
+- Added centralized error handling that logs errors to a file and ensures users receive safe, non-technical error responses.
+
+### Example .env 
+```
+DB_URL=postgresql://postgres:********@localhost:5432/fitness_app
+JWT_SECRET=jwt_secret_key
+```
+
+### Example HTTP Headers
+
+- `Authorization: 'Bearer <token>'`
+- `language: 'sk' or 'en'`
+
+### API Routes
+
+Body, URL parameters, and query validation schemas are located in `src/validation/schemas`.
+
+
+#### Authorization
+
+- POST `/auth/register` - register a user
+- POST `/auth/login` - login a user
+
+#### Exercises
+
+- GET `/exercises` + `?page=1&limit=10&programID=1&search=Exercise` – list exercises with pagination, filter, search
+- POST `/exercises` – create new exercise (ADMIN)
+- PUT `/exercises/:id` - update exercise
+- DELETE `/exercises/:id` - delete exercise
+
+#### Programs
+
+- GET `/programs` – list programs
+- PUT `/programs/:programID/exercise/:exerciseID` – add existing exercise to program (ADMIN)
+- DELETE `/programs/:programID/exercise/:exerciseID` – remove exercise from program (ADMIN)
+
+#### Users
+
+- GET `/users` – get all users (ADMIN: full, USER: id & nickName)
+- GET `/users/me` – get own profile (USER)
+- GET `/users/:id` – get user detail by ID (ADMIN)
+- PUT `/users/:id` – update user (ADMIN)
+
+#### Completed Exercises (USER)
+
+- POST `/users/me/completed-exercises` – track a completed exercise
+- GET `/users/me/completed-exercises` – list tracked exercises
+- DELETE `/users/me/completed-exercises/:id` – remove tracked exercise
+
+
+#
 # Fitness app - assignment
 
 ### Requirements
