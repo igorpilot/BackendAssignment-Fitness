@@ -23,5 +23,8 @@
   "EXERCISE_UPDATED": "Cvičenie bolo úspešne aktualizované",
   "EXERCISE_DELETED": "Cvičenie bolo úspešne vymazané",
 
-  "LIST_OF_PROGRAMS": "Zoznam programov"
+  "LIST_OF_PROGRAMS": "Zoznam programov",
+  "EXERCISE_ALREADY_IN_PROGRAM": "Cvičenie je už v programe",
+  "EXERCISE_ADDED_TO_PROGRAM": "Cvičenie pridané do programu",
+  "EXERCISE_REMOVED_FROM_PROGRAM": "Cvičenie odstránené z programu"
 }

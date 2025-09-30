@@ -23,5 +23,8 @@
   "EXERCISE_UPDATED": "Exercise updated successfully",
   "EXERCISE_DELETED": "Exercise deleted successfully",
 
-  "LIST_OF_PROGRAMS": "List of programs"
+  "LIST_OF_PROGRAMS": "List of programs",
+  "EXERCISE_ALREADY_IN_PROGRAM": "Exercise already in program",
+  "EXERCISE_ADDED_TO_PROGRAM": "Exercise added to program",
+  "EXERCISE_REMOVED_FROM_PROGRAM": "Exercise removed from program"
 }

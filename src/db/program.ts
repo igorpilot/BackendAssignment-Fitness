@@ -33,7 +33,7 @@ export default (sequelize: Sequelize, modelName: string) => {
     ProgramModelCtor.hasMany(models.Exercise, {
       foreignKey: {
         name: "programID",
-        allowNull: false,
+        allowNull: true,
       },
     });
   };
