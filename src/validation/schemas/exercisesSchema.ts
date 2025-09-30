@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { EXERCISE_DIFFICULTY } from "../../utils/enums";
 
-export const idParamSchema = Joi.object({
+export const idExerciseParamSchema = Joi.object({
   id: Joi.number().integer().positive().required(),
 });
 

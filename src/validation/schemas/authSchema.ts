@@ -7,7 +7,9 @@ export const registerAuthSchema = Joi.object({
   nickName: Joi.string().min(2).max(30).optional(),
   email: Joi.string().email().required(),
   age: Joi.number().integer().min(1).optional(),
-  role: Joi.string().valid(...Object.values(USER_ROLE)).required(),
+  role: Joi.string()
+    .valid(...Object.values(USER_ROLE))
+    .required(),
   password: Joi.string().min(8).required(),
 });
 

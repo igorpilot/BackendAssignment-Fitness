@@ -10,5 +10,7 @@ export const updateUserSchema = Joi.object({
   surname: Joi.string().min(2).max(100).optional(),
   nickName: Joi.string().min(2).max(100).optional(),
   age: Joi.number().integer().positive().optional(),
-  role: Joi.string().valid(...Object.values(USER_ROLE)).optional(),
+  role: Joi.string()
+    .valid(...Object.values(USER_ROLE))
+    .optional(),
 });

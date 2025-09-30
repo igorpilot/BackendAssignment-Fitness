@@ -11,19 +11,26 @@ import { signToken } from "../utils/jwt";
 const router = Router();
 
 const { User } = models;
+
 export default () => {
+
   router.post(
     "/register",
     validate({ body: registerAuthSchema }),
-    async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-      const { name, surname, nickName, email, age, role, password } = req.body;
-
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
+        const { name, surname, nickName, email, age, role, password } =
+          req.body;
+
         const existingUser = await User.findOne({ where: { email } });
+
         if (existingUser) {
-          return res.status(409).json({ message: req.t("EMAIL_ALREADY_IN_USE") });
+          res.status(409).json({ message: req.t("EMAIL_ALREADY_IN_USE") });
+          return;
         }
+
         const hashedPassword = await bcrypt.hash(password, 10);
+
         const newUser = await User.create({
           name,
           surname,
@@ -33,6 +40,7 @@ export default () => {
           role,
           password: hashedPassword,
         });
+
         const token = signToken({ id: newUser.id });
 
         res.json({
@@ -49,21 +57,26 @@ export default () => {
   router.post(
     "/login",
     validate({ body: loginAuthSchema }),
-    async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       const { email, password } = req.body;
       try {
         const user = await User.findOne({ where: { email } });
+
         if (!user) {
-          return res.status(401).json({ message: req.t("INVALID_CREDENTIALS") });
+          res.status(401).json({ message: req.t("INVALID_CREDENTIALS") });
+          return;
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
+
         if (!isPasswordValid) {
-          return res.status(401).json({ message: req.t("INVALID_CREDENTIALS") });
+          res.status(401).json({ message: req.t("INVALID_CREDENTIALS") });
+          return;
         }
+
         const token = signToken({ id: user.id });
 
-        return res.json({
+        res.json({
           data: { token, id: user.id },
           message: req.t("LOGIN_SUCCESS"),
         });

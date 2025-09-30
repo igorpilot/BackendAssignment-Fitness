@@ -5,7 +5,7 @@ import { USER_ROLE } from "../utils/enums";
 import {
   createExerciseSchema,
   exerciseQuerySchema,
-  idParamSchema,
+  idExerciseParamSchema,
   updateExerciseSchema,
 } from "../validation/schemas/exercisesSchema";
 import { validate } from "../validation/validate";
@@ -18,10 +18,11 @@ const { Exercise, Program } = models;
 export default () => {
   router.get(
     "/",
-    [authMiddleware, validate({ query: exerciseQuerySchema })],
+    validate({ query: exerciseQuerySchema }),
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
         const { where, pagination } = parseQuery(req.query);
+
         const { rows, count } = await Exercise.findAndCountAll({
           where,
           include: [
@@ -49,6 +50,7 @@ export default () => {
       }
     }
   );
+
   router.post(
     "/",
     [
@@ -59,14 +61,18 @@ export default () => {
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
         const { name, difficulty, programID } = req.body;
+
         const program = await Program.findByPk(programID);
+
         if (!program) {
           res
             .status(404)
             .json({ data: {}, message: req.t("PROGRAM_NOT_FOUND") });
           return;
         }
+
         const exercise = await Exercise.create({ name, difficulty, programID });
+
         res.json({
           data: { id: exercise.id },
           message: req.t("EXERCISE_CREATED"),
@@ -83,11 +89,12 @@ export default () => {
     [
       authMiddleware,
       roleMiddleware([USER_ROLE.ADMIN]),
-      validate({ params: idParamSchema, body: updateExerciseSchema }),
+      validate({ params: idExerciseParamSchema, body: updateExerciseSchema }),
     ],
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
         const { id } = req.params;
+
         const exercise = await Exercise.findByPk(id);
 
         if (!exercise) {
@@ -96,7 +103,9 @@ export default () => {
             .json({ data: {}, message: req.t("EXERCISE_NOT_FOUND") });
           return;
         }
+
         const ALLOWED_FIELDS = ["name", "difficulty", "programID"];
+
         Object.keys(req.body).forEach((field) => {
           if (ALLOWED_FIELDS.includes(field)) {
             (exercise as any)[field] = req.body[field];
@@ -104,6 +113,7 @@ export default () => {
         });
 
         await exercise.save();
+
         res.json({
           data: { id: exercise.id },
           message: req.t("EXERCISE_UPDATED"),
@@ -120,11 +130,12 @@ export default () => {
     [
       authMiddleware,
       roleMiddleware([USER_ROLE.ADMIN]),
-      validate({ params: idParamSchema }),
+      validate({ params: idExerciseParamSchema }),
     ],
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
         const { id } = req.params;
+
         const exercise = await Exercise.findOne({ where: { id } });
 
         if (!exercise) {
@@ -133,7 +144,9 @@ export default () => {
             .json({ data: {}, message: req.t("EXERCISE_NOT_FOUND") });
           return;
         }
+
         await Exercise.destroy({ where: { id } });
+
         res.status(200).json({ data: {}, message: req.t("EXERCISE_DELETED") });
       } catch (err) {
         err.contextMessage = "Error during admin delete exercise";
@@ -141,5 +154,6 @@ export default () => {
       }
     }
   );
+  
   return router;
 };

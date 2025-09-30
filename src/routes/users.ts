@@ -18,21 +18,23 @@ export default () => {
   router.get(
     "/",
     [authMiddleware, roleMiddleware([USER_ROLE.ADMIN, USER_ROLE.USER])],
-    async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
         const user = req.user as UserModel;
+
         const users = await User.findAll({
           attributes:
             user.role === USER_ROLE.ADMIN
               ? { exclude: ["password"] }
               : ["id", "nickName"],
         });
+
         if (!users) {
-          return res
-            .status(404)
-            .json({ data: {}, message: req.t("USER_NOT_FOUND") });
+          res.status(404).json({ data: {}, message: req.t("USER_NOT_FOUND") });
+          return;
         }
-        return res.json({ data: users, message: req.t("LIST_OF_USERS") });
+
+        res.json({ data: users, message: req.t("LIST_OF_USERS") });
       } catch (err) {
         err.contextMessage = "Error fetching all users";
         next(err);
@@ -42,20 +44,20 @@ export default () => {
   router.get(
     "/me",
     [authMiddleware, roleMiddleware([USER_ROLE.USER])],
-    async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
         const user = req.user as UserModel;
+
         const profile = await User.findByPk(user.id, {
           attributes: ["name", "surname", "age", "nickName"],
         });
 
         if (!profile) {
-          return res
-            .status(404)
-            .json({ data: {}, message: req.t("USER_NOT_FOUND") });
+          res.status(404).json({ data: {}, message: req.t("USER_NOT_FOUND") });
+          return;
         }
 
-        return res.json({ data: profile, message: req.t("USER_DETAIL") });
+        res.json({ data: profile, message: req.t("USER_DETAIL") });
       } catch (err) {
         err.contextMessage = "Error fetching user detail";
         next(err);
@@ -69,20 +71,20 @@ export default () => {
       roleMiddleware([USER_ROLE.ADMIN]),
       validate({ params: idUserParamSchema }),
     ],
-    async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
         const { id } = req.params;
+
         const user = await User.findByPk(id, {
           attributes: { exclude: ["password"] },
         });
 
         if (!user) {
-          return res
-            .status(404)
-            .json({ data: {}, message: req.t("USER_NOT_FOUND") });
+          res.status(404).json({ data: {}, message: req.t("USER_NOT_FOUND") });
+          return;
         }
 
-        return res.json({ data: user, message: "User detail" });
+        res.json({ data: user, message: "User detail" });
       } catch (err) {
         err.contextMessage = "Error fetching user detail";
         next(err);
@@ -97,15 +99,19 @@ export default () => {
       roleMiddleware([USER_ROLE.ADMIN]),
       validate({ params: idUserParamSchema, body: updateUserSchema }),
     ],
-    async (req: Request, res: Response, next: NextFunction): Promise<any> => {
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
         const { id } = req.params;
+
         const user = await User.findByPk(id);
 
         if (!user) {
-          return res.status(404).json({ data: {}, message: "User not found" });
+          res.status(404).json({ data: {}, message: "User not found" });
+          return;
         }
+
         const ALLOWED_FIELDS = ["name", "surname", "nickName", "age", "role"];
+
         Object.keys(req.body).forEach((field) => {
           if (ALLOWED_FIELDS.includes(field)) {
             (user as any)[field] = req.body[field];
@@ -113,7 +119,8 @@ export default () => {
         });
 
         await user.save();
-        return res.json({
+
+        res.json({
           data: { id: user.id },
           message: req.t("USER_UPDATED"),
         });
@@ -124,99 +131,105 @@ export default () => {
     }
   );
   //ROUTES FOR TRACKING EXERCISES
-    router.post(
-        "/me/completed-exercises",
-        [
-            authMiddleware,
-            roleMiddleware([USER_ROLE.USER]),
-            validate({
-                body: createCompletedExerciseSchema,
-            }),
-        ],
-        async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-            try {
-                const currentUser = req.user as UserModel;
-                const { exerciseId, duration, completedAt } = req.body;
+  router.post(
+    "/me/completed-exercises",
+    [
+      authMiddleware,
+      roleMiddleware([USER_ROLE.USER]),
+      validate({
+        body: createCompletedExerciseSchema,
+      }),
+    ],
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const currentUser = req.user as UserModel;
 
-                const exercise = await Exercise.findByPk(exerciseId);
-                if (!exercise) {
-                    return res
-                        .status(404)
-                        .json({ data: {}, message: req.t("EXERCISE_NOT_FOUND") });
-                }
+        const { exerciseID, duration, completedAt } = req.body;
 
-                const completedExercise = await CompletedExercise.create({
-                    userID: currentUser.id,
-                    exerciseID: exerciseId,
-                    completedAt: completedAt ? new Date(completedAt) : new Date(),
-                    duration,
-                });
+        const exercise = await Exercise.findByPk(exerciseID);
 
-                return res
-                    .status(201)
-                    .json({
-                        data: { id: completedExercise.id },
-                        message: req.t("EXERCISE_TRACKED"),
-                    });
-            } catch (err) {
-                err.contextMessage = "Error creating completed exercise";
-                next(err);
-            }
+        if (!exercise) {
+          res
+            .status(404)
+            .json({ data: {}, message: req.t("EXERCISE_NOT_FOUND") });
+          return;
         }
-    );
 
-router.get(
+        const completedExercise = await CompletedExercise.create({
+          userID: currentUser.id,
+          exerciseID: exerciseID,
+          completedAt: completedAt ? new Date(completedAt) : new Date(),
+          duration,
+        });
+
+        res.status(201).json({
+          data: { id: completedExercise.id },
+          message: req.t("EXERCISE_TRACKED"),
+        });
+      } catch (err) {
+        err.contextMessage = "Error creating completed exercise";
+        next(err);
+      }
+    }
+  );
+
+  router.get(
     "/me/completed-exercises",
     [authMiddleware, roleMiddleware([USER_ROLE.USER])],
-    async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-        try {
-            const currentUser = req.user as UserModel;
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const currentUser = req.user as UserModel;
 
-            const completedExercises = await CompletedExercise.findAll({
-                where: { userID: currentUser.id },
-                attributes: ["id", "exerciseID", "duration", "completedAt"],
-                order: [["completedAt", "DESC"]],
-            });
+        const completedExercises = await CompletedExercise.findAll({
+          where: { userID: currentUser.id },
+          attributes: ["id", "exerciseID", "duration", "completedAt"],
+          order: [["completedAt", "DESC"]],
+        });
 
-            return res.json({
-                data: completedExercises,
-                message: req.t("COMPLETED_EXERCISES_LIST"),
-            });
-        } catch (err) {
-            err.contextMessage = "Error fetching completed exercises";
-            next(err);
-        }
+        res.json({
+          data: completedExercises,
+          message: req.t("COMPLETED_EXERCISES_LIST"),
+        });
+      } catch (err) {
+        err.contextMessage = "Error fetching completed exercises";
+        next(err);
+      }
     }
-);
+  );
 
-router.delete(
+  router.delete(
     "/me/completed-exercises/:id",
     [
-        authMiddleware,
-        roleMiddleware([USER_ROLE.USER]),
-        validate({ params: idUserParamSchema }),
+      authMiddleware,
+      roleMiddleware([USER_ROLE.USER]),
+      validate({ params: idUserParamSchema }),
     ],
-    async (req: Request, res: Response, next: NextFunction): Promise<any> => {
-        try {
-            const currentUser = req.user as UserModel;
-            const { id } = req.params;
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const currentUser = req.user as UserModel;
 
-            const item = await CompletedExercise.findOne({
-                where: { id, userID: currentUser.id },
-            });
-            if (!item) {
-                return res
-                    .status(404)
-                    .json({ data: {}, message: req.t("TRACKED_ITEM_NOT_FOUND") });
-            }
+        const { id } = req.params;
 
-            await item.destroy();
-            return res.status(204).send();
-        } catch (err) {
-            err.contextMessage = "Error deleting tracked exercise";
-            next(err);
+        const item = await CompletedExercise.findOne({
+          where: { id, userID: currentUser.id },
+        });
+
+        if (!item) {
+          res
+            .status(404)
+            .json({ data: {}, message: req.t("TRACKED_ITEM_NOT_FOUND") });
+          return;
         }
+
+        await item.destroy();
+
+        res.status(204).send();
+      } catch (err) {
+        err.contextMessage = "Error deleting tracked exercise";
+        next(err);
+      }
     }
-);
+  );
+
   return router;
 };

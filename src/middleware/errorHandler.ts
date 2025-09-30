@@ -14,12 +14,14 @@ export const errorHandler = (
   _next: NextFunction
 ) => {
   const contextMessage = err.contextMessage ? `[${err.contextMessage}] ` : "";
-  const logMessage = `[${new Date().toISOString()}] ${contextMessage}${err.stack || err}\n`;
+  const logMessage = `[${new Date().toISOString()}] ${contextMessage}${
+    err.stack || err
+  }\n`;
 
   console.error(logMessage); // Logging to console
 
   // Logging to file
-  const logDir = path.join(__dirname, "../../logs");   
+  const logDir = path.join(__dirname, "../../logs");
   const logPath = path.join(logDir, "error.log");
   if (!fs.existsSync(logDir)) {
     fs.mkdirSync(logDir, { recursive: true });
@@ -29,9 +31,10 @@ export const errorHandler = (
   });
 
   // 3. Send generic error response
-  res.status(err.statusCode && err.statusCode >= 400 ? err.statusCode : 500).json({
-    data: {},
-    message: "Something went wrong",
-  });
+  res
+    .status(err.statusCode && err.statusCode >= 400 ? err.statusCode : 500)
+    .json({
+      data: {},
+      message: "Something went wrong",
+    });
 };
-

@@ -1,36 +1,37 @@
-import http from 'http'
-import express from 'express'
-import { sequelize } from './db'
-import ProgramRouter from './routes/programs'
-import ExerciseRouter from './routes/exercises'
-import AuthRouter from './routes/auth'
-import UserRouter from './routes/users'
-import dotenv from 'dotenv';
-import { errorHandler } from './middleware/errorHandler'
-import passport from './middleware/passport'
-import { initLocalization } from './utils/localization'
-
+import http from "http";
+import express from "express";
+import { sequelize } from "./db";
+import ProgramRouter from "./routes/programs";
+import ExerciseRouter from "./routes/exercises";
+import AuthRouter from "./routes/auth";
+import UserRouter from "./routes/users";
+import dotenv from "dotenv";
+import { errorHandler } from "./middleware/errorHandler";
+import passport from "./middleware/passport";
+import { initLocalization } from "./utils/localization";
 
 dotenv.config();
 
-const app = express()
+const app = express();
 app.use(initLocalization());
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json())
-app.use('/programs', ProgramRouter())
-app.use('/exercises', ExerciseRouter())
-app.use('/auth', AuthRouter());
-app.use('/users', UserRouter());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use("/programs", ProgramRouter());
+app.use("/exercises", ExerciseRouter());
+app.use("/auth", AuthRouter());
+app.use("/users", UserRouter());
 app.use(passport.initialize());
 app.use(errorHandler);
-const httpServer = http.createServer(app)
+const httpServer = http.createServer(app);
 
 try {
-    sequelize.sync()
+  sequelize.sync();
 } catch (error) {
-    console.log('Sequelize sync error')
+  console.log("Sequelize sync error");
 }
 
-httpServer.listen(8000).on('listening', () => console.log(`Server started at port ${8000}`))
+httpServer
+  .listen(8000)
+  .on("listening", () => console.log(`Server started at port ${8000}`));
 
-export default httpServer
+export default httpServer;

@@ -19,13 +19,16 @@ sequelize
 const Exercise = defineExercise(sequelize, "exercise");
 const Program = defineProgram(sequelize, "program");
 const User = defineUser(sequelize, "user");
-const CompletedExercise = defineCompletedExercise(sequelize, "completedExercise")
+const CompletedExercise = defineCompletedExercise(
+  sequelize,
+  "completedExercise"
+);
 
 const models = {
   Exercise,
   Program,
   User,
-  CompletedExercise
+  CompletedExercise,
 };
 type Models = typeof models;
 
